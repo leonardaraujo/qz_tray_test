@@ -16,6 +16,9 @@ function App() {
   const [printers, setPrinters] = useState<string[]>([])
   const [selectedPrinter, setSelectedPrinter] = useState<string>('')
 
+  // Obtener la URL base de manera dinámica
+  const baseUrl = window.location.origin
+
   useEffect(() => {
     // Cargar el script de QZ Tray
     const script = document.createElement('script')
@@ -95,41 +98,59 @@ function App() {
     }
   }
 
-const printImage = async () => {
-  if (!selectedPrinter) {
-    alert('Por favor selecciona una impresora')
-    return
+  const printImage = async () => {
+    if (!selectedPrinter) {
+      alert('Por favor selecciona una impresora')
+      return
+    }
+
+    try {
+      const config = window.qz.configs.create(selectedPrinter)
+      // URL dinámica de la imagen
+      const imageUrl = `${baseUrl}/miimagen.png`
+      await window.qz.print(config, [{ type: 'image', data: imageUrl }])
+      console.log('Imagen enviada a imprimir')
+    } catch (error) {
+      console.error('Error al imprimir imagen:', error)
+      alert('Error al imprimir imagen: ' + error)
+    }
+  }  
+
+  const printPDF = async () => {
+    if (!selectedPrinter) {
+      alert('Por favor selecciona una impresora')
+      return
+    }
+
+    try {
+      const config = window.qz.configs.create(selectedPrinter)
+      // URL dinámica del PDF
+      const pdfUrl = `${baseUrl}/miarchivo.pdf`
+      await window.qz.print(config, [{ type: 'pdf', data: pdfUrl }])
+      console.log('PDF enviado a imprimir')
+    } catch (error) {
+      console.error('Error al imprimir PDF:', error)
+      alert('Error al imprimir PDF: ' + error)
+    }
   }
 
-  try {
-    const config = window.qz.configs.create(selectedPrinter)
-    // URL pública de la imagen
-    const imageUrl = 'http://localhost:8080/miimagen.png'
-    await window.qz.print(config, [{ type: 'image', data: imageUrl }])
-    console.log('Imagen enviada a imprimir')
-  } catch (error) {
-    console.error('Error al imprimir imagen:', error)
-    alert('Error al imprimir imagen: ' + error)
-  }
-}  
+  const printA4PDF = async () => {
+    if (!selectedPrinter) {
+      alert('Por favor selecciona una impresora')
+      return
+    }
 
-const printPDF = async () => {
-  if (!selectedPrinter) {
-    alert('Por favor selecciona una impresora')
-    return
+    try {
+      const config = window.qz.configs.create(selectedPrinter)
+      // URL dinámica del PDF A4
+      const pdfUrl = `${baseUrl}/miarchivoA4.pdf`
+      await window.qz.print(config, [{ type: 'pdf', data: pdfUrl }])
+      console.log('PDF A4 enviado a imprimir')
+    } catch (error) {
+      console.error('Error al imprimir PDF A4:', error)
+      alert('Error al imprimir PDF A4: ' + error)
+    }
   }
-
-  try {
-    const config = window.qz.configs.create(selectedPrinter)
-    // URL pública del PDF
-    const pdfUrl = 'http://localhost:8080/miarchivo.pdf'
-    await window.qz.print(config, [{ type: 'pdf', data: pdfUrl }])
-    console.log('PDF enviado a imprimir')
-  } catch (error) {
-    console.error('Error al imprimir PDF:', error)
-    alert('Error al imprimir PDF: ' + error)
-  }
-}
 
   return (
     <>
@@ -196,22 +217,38 @@ const printPDF = async () => {
         >
           Imprimir PDF
         </button>
-          <button
-  onClick={printImage}
-  disabled={!qzReady || !selectedPrinter}
-  style={{
-    padding: '10px 20px',
-    fontSize: '16px',
-    backgroundColor: qzReady && selectedPrinter ? '#007acc' : '#ccc',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: qzReady && selectedPrinter ? 'pointer' : 'not-allowed',
-    marginTop: '10px'
-  }}
->
-  Imprimir Imagen
-</button>
+        <button
+          onClick={printA4PDF}
+          disabled={!qzReady || !selectedPrinter}
+          style={{
+            padding: '10px 20px',
+            fontSize: '16px',
+            backgroundColor: qzReady && selectedPrinter ? '#007acc' : '#ccc',
+            color: 'white',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: qzReady && selectedPrinter ? 'pointer' : 'not-allowed',
+            marginTop: '10px'
+          }}
+        >
+          Imprimir PDF A4
+        </button>
+        <button
+          onClick={printImage}
+          disabled={!qzReady || !selectedPrinter}
+          style={{
+            padding: '10px 20px',
+            fontSize: '16px',
+            backgroundColor: qzReady && selectedPrinter ? '#007acc' : '#ccc',
+            color: 'white',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: qzReady && selectedPrinter ? 'pointer' : 'not-allowed',
+            marginTop: '10px'
+          }}
+        >
+          Imprimir Imagen
+        </button>
         <div style={{ marginTop: '20px' }}>
           <button onClick={() => setCount((count) => count + 1)}>
             count is {count}
